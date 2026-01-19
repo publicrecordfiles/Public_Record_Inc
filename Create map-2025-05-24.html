@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>May 24, 2025 | Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 900px; margin: 30px auto; padding: 0 16px; line-height: 1.6; }
+    #map { height: 560px; border: 1px solid #ddd; border-radius: 10px; }
+    .note { color: #333; font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+
+<h1>May 24, 2025 — Location Overview</h1>
+
+<p class="note">
+Blue markers represent rounded (3-decimal) device location estimates for 2025-05-24 (AT&amp;T).
+The alleged location is shown as an approximate area (not a pinpoint) for public safety.
+Carrier records are stored in UTC and location results are estimates.
+</p>
+
+<p>
+  <a href="index.html">Home</a> |
+  <a href="documents.html">Documents</a> |
+  <a href="map-2025-05-24.html">Map (05/24/2025)</a>
+</p>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // PUBLIC SAFE alleged area (rounded + radius)
+  const allegedCenter = [39.321, -76.618]; // rounded to 3 decimals
+  const allegedRadiusMeters = 1200;        // ~0.75 miles
+
+  const map = L.map('map').setView(allegedCenter, 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+  // Red alleged area (no pinpoint)
+  L.circle(allegedCenter, { radius: allegedRadiusMeters }).addTo(map);
+
+  // Load blue points
+  fetch('data/points_2025-05-24.json')
+    .then(r => r.json())
+    .then(points => {
+      const layer = L.layerGroup().addTo(map);
+      points.forEach(([lat, lon]) => {
+        L.circleMarker([lat, lon], { radius: 5 }).addTo(layer);
+      });
+
+      const bounds = L.latLngBounds(points.concat([allegedCenter]));
+      map.fitBounds(bounds.pad(0.25));
+    });
+</script>
+
+</body>
+</html>
+
